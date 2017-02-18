@@ -1,4 +1,5 @@
 import pygame
+import random
 
 pygame.init()
 
@@ -13,6 +14,7 @@ gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
 font = pygame.font.SysFont(None,25) #size25
 
+locations = [(display_height*.8)]
 class Odysseus():
 	def __init__(self):
 		self.x = display_width*.2
@@ -26,8 +28,8 @@ class Odysseus():
 		self.middle_of_jump = False
 		self.at_max_height = False
 		self.travel_step = 50
-		img = pygame.image.load('right_odysseus.gif')
-		gameDisplay.blit(img, [self.x, self.y, self.block_size, self.block_size])
+		self.img = pygame.image.load('right_odysseus.gif')
+		gameDisplay.blit(self.img , [self.x, self.y, self.block_size, self.block_size])
 
 	def update_image(self,lead_y, direction):
 		file_name = direction + '_odysseus.gif'
@@ -35,14 +37,33 @@ class Odysseus():
 		gameDisplay.blit(img, [self.x, lead_y, self.block_size, self.block_size])
 	
 
-#class Cyclops():
-	#def __init__(self,word):
-		#self.x = display_width*.8
+class Cyclop(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		#self.word = word
+		#self.x = random.randrange(display_width*.6, display_width*.95)
 		#self.y = display_height*.8
-		#self.block_size = 50
-		#file_name = 'right_cyclops.gif'
-		#img = pygame.image.load(file_name)
-		#gameDisplay.blit(img, [self.x, lead_y, self.block_size, self.block_size])
+		self.block_size = 50
+		self.travel = random.randrange(6)
+		self.image = pygame.image.load('monster.png')
+		
+		self.rect = self.image.get_rect()
+		self.rect.x = random.randrange(display_width*.6, display_width*.95) #display_width*.4
+		self.rect.y = display_height*.8 #display_height*.4
+		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
+		self.speedx = - random.randrange(2,4)
+		
+		
+		
+		
+
+	def update(self):
+		self.rect = self.rect.move(self.speedx,0)
+		#print(self.travel)
+		#self.x = self.x - self.travel
+		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
+		#gameDisplay.blit(self.image, [self.x, self.y, self.block_size, self.block_size])
+		
 
 def text_objects(text,color):
 	textSurface = font.render(text, True, color) # render text
@@ -72,6 +93,11 @@ def gameloop():
 	at_max_height = False
 	direction = "right"
 	lives = 3
+	
+	all_sprites = pygame.sprite.Group()
+	cyclops = pygame.sprite.Group()
+		
+	
 
 	while not gameExit:
 		while gameOver == True:
@@ -93,6 +119,10 @@ def gameloop():
 					if event.key == pygame.K_c: # if the player continues game
 						gameloop() 
 
+		c = Cyclop()
+		all_sprites.add(c)
+		cyclops.add(c)
+		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				gameExit = True
@@ -123,12 +153,17 @@ def gameloop():
 			middle_of_jump = False
 			at_max_height = False
 			lead_y += change_y
-
+		
 		gameDisplay.fill(white)
 		player.update_image(lead_y, key_pressed)
+		cyclops.update()
+		all_sprites.update()
 		pygame.display.update()
 		clock.tick(FSP)
 
+
+
 player = Odysseus()
-#cyclops = Cyclops("girl")
+
+
 gameloop()
