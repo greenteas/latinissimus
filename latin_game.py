@@ -34,19 +34,39 @@ class Odysseus(pygame.sprite.Sprite):
 		self.attack_delay = 60
 		self.attack_delay_counter = 0
 		self.image = pygame.image.load('right_odysseus.gif')
-		#self.rect = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
-		self.sword_boundary = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
-		self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.sword_boundary)
+		self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 		gameDisplay.blit(self.image, [self.x, self.y, self.width, self.height])
 
 	def update_image(self,lead_y, direction):
 		file_name = direction + '_odysseus.gif'
 		self.image = pygame.image.load(file_name)
-		#self.rect = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
-		self.sword_boundary = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
-		self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.sword_boundary)
+		self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+		#pygame.draw.rect(gameDisplay, black, self.rect)
+		#if self.attack_state:
+			#sword_hitbox(self)
 		gameDisplay.blit(self.image, [self.x, lead_y, self.width, self.height])
 	
+class sword_hitbox(pygame.sprite.Sprite):
+	def __init__(self):
+		self.sword_height = 0
+		self.sword_length = 0
+		self.rect = pygame.Rect(0,0,1,1)
+
+	def set(self, player):
+		self.sword_height= player.height
+		self.sword_length= 40
+		self.rect = pygame.Rect(player.x+player.width,player.y, self.sword_length, self.sword_height)
+		#self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.rect)
+	
+	def reset(self):
+		self.sword_height = 0
+		self.sword_length = 0
+		self.rect = pygame.Rect(0,0,1,1)
+
+	def update_hitbox(self, player):
+		self.sword_height: player.height
+		self.rect = pygame.Rect(player.x+player.width,player.y, self.sword_length, self.sword_height)
+		#self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.rect)
 
 class Cyclop(pygame.sprite.Sprite):
 
@@ -94,6 +114,9 @@ def gameloop():
 	create_Cyclopes = pygame.USEREVENT+1
 	pygame.time.set_timer(create_Cyclopes,3000)
 
+	sword = sword_hitbox()
+	count = 0
+
 	while not gameExit:
 		while gameOver == True:
 			gameDisplay.fill(black)
@@ -138,9 +161,11 @@ def gameloop():
 
 		if player.attack_state == True and player.attack_delay_counter < player.attack_delay:
 			player.attack_delay_counter += 10
+			sword.set(player)
 		else:
 			player.attack_delay_counter = 0
 			player.attack_state = False
+			sword.reset()
 			if not player.attack_state:
 				player.direction = "right"
 
@@ -161,7 +186,13 @@ def gameloop():
 			player.middle_of_jump = False
 			player.at_max_height = False
 			player.y += player.change_y
-		
+	
+		if pygame.sprite.spritecollideany(player, cyclops):
+			gameOver = True
+		if pygame.sprite.spritecollideany(sword, cyclops):
+			count +=1
+			print(count)
+
 		gameDisplay.fill(white)
 		player.update_image(player.y, player.direction)
 		cyclops.update()
