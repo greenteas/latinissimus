@@ -15,26 +15,37 @@ pygame.display.set_caption('Latinissmimus')
 font = pygame.font.SysFont(None,25) #size25
 
 locations = [(display_height*.8)]
-class Odysseus():
+class Odysseus(pygame.sprite.Sprite):
 	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
 		self.x = display_width*.2
 		self.y = display_height*.8
 		self.direction = "right"
 		self.lives = 3
-		self.block_size = 50
+		self.height = 50
+		self.width = 50
 		#Jump Variables
-		self.jump_max_height = self.y-self.block_size*2
+		self.jump_max_height = self.y-self.height*2
 		self.change_y = 0
 		self.middle_of_jump = False
 		self.at_max_height = False
+		self.attack_state= False
 		self.travel_step = 50
-		self.img = pygame.image.load('right_odysseus.gif')
-		gameDisplay.blit(self.img , [self.x, self.y, self.block_size, self.block_size])
+		self.attack_delay = 60
+		self.attack_delay_counter = 0
+		self.image = pygame.image.load('right_odysseus.gif')
+		#self.rect = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
+		self.sword_boundary = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
+		self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.sword_boundary)
+		gameDisplay.blit(self.image, [self.x, self.y, self.width, self.height])
 
 	def update_image(self,lead_y, direction):
 		file_name = direction + '_odysseus.gif'
-		img = pygame.image.load(file_name)
-		gameDisplay.blit(img, [self.x, lead_y, self.block_size, self.block_size])
+		self.image = pygame.image.load(file_name)
+		#self.rect = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
+		self.sword_boundary = [self.x+self.width*.9, self.y+self.height*.4, self.width*.3, self.height*.2]
+		self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.sword_boundary)
+		gameDisplay.blit(self.image, [self.x, lead_y, self.width, self.height])
 	
 
 class Cyclop(pygame.sprite.Sprite):
@@ -52,10 +63,6 @@ class Cyclop(pygame.sprite.Sprite):
 		self.rect.y = display_height*.8 #display_height*.4
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
 		self.speedx = - random.randrange(2,4)
-		
-		
-		
-		
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
@@ -80,24 +87,20 @@ def gameloop():
 	gameExit = False
 	gameOver = False
 
+	player = Odysseus()
+
 	clock = pygame.time.Clock()
 	FSP = 30
-	block_size = 50
 	y_start_pos = display_height*.8
-	jump_max_height = y_start_pos-block_size*2
-	change_y = 0
-	travel_step = 50
-	lead_y = y_start_pos
 	bottom = y_start_pos
-	middle_of_jump = False
-	at_max_height = False
-	direction = "right"
-	lives = 3
 	
 	all_sprites = pygame.sprite.Group()
 	cyclops = pygame.sprite.Group()
 		
-	
+	for i in range(5):
+		c = Cyclop()
+		all_sprites.add(c)
+		cyclops.add(c)
 
 	while not gameExit:
 		while gameOver == True:
@@ -119,51 +122,57 @@ def gameloop():
 					if event.key == pygame.K_c: # if the player continues game
 						gameloop() 
 
-		c = Cyclop()
-		all_sprites.add(c)
-		cyclops.add(c)
-		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				gameExit = True
 				gameOver = False
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_UP and middle_of_jump == False:
-					change_y= -travel_step
-					middle_of_jump = True
+				if event.key == pygame.K_UP and player.middle_of_jump == False:
+					player.change_y= -player.travel_step
+					player.middle_of_jump = True
 				# NOTE: REMOVE BOTTOM TWO LINES ONCE WE HAVE CYCLOPS 
 				elif event.key == pygame.K_x:	
 					gameOver = True
+				elif event.key == pygame.K_z:
+					player.direction = "attack"
+					player.attack_state = True
 
-		lead_y += change_y
+		player.y += player.change_y
 
-		if middle_of_jump and not at_max_height:
-			change_y +=travel_step/10
-			key_pressed = "up"
-		elif middle_of_jump and at_max_height:
-			change_y -=travel_step/10
+		if player.attack_state == True and player.attack_delay_counter < player.attack_delay:
+			player.attack_delay_counter += 10
 		else:
-			key_pressed = "right"
+			player.attack_delay_counter = 0
+			player.attack_state = False
+			if not player.attack_state:
+				player.direction = "right"
+
+		if player.middle_of_jump and not player.at_max_height:
+			player.change_y +=player.travel_step/10
+			if not player.attack_state:
+				player.direction = "up"
+		elif player.middle_of_jump and player.at_max_height:
+			player.change_y -= player.travel_step/10
+		elif player.direction != "attack":
+			player.direction = "right"
 		#make block go down after maximum height/ land on bottom	
-		if lead_y == jump_max_height:
-			change_y = travel_step
-			at_max_height = True
-		if lead_y >= bottom:
-			change_y = 0
-			middle_of_jump = False
-			at_max_height = False
-			lead_y += change_y
+		if player.y == player.jump_max_height:
+			player.change_y = player.travel_step
+			player.at_max_height = True
+		if player.y >= bottom:
+			player.change_y = 0
+			player.middle_of_jump = False
+			player.at_max_height = False
+			player.y += player.change_y
 		
 		gameDisplay.fill(white)
-		player.update_image(lead_y, key_pressed)
+		player.update_image(player.y, player.direction)
 		cyclops.update()
 		all_sprites.update()
 		pygame.display.update()
 		clock.tick(FSP)
 
 
-
-player = Odysseus()
 
 
 gameloop()
