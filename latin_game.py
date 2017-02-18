@@ -33,14 +33,15 @@ class Odysseus(pygame.sprite.Sprite):
 		self.travel_step = 50
 		self.attack_delay = 60
 		self.attack_delay_counter = 0
-		self.image = pygame.image.load('right_odysseus.gif')
-		self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+		self.image = pygame.image.load('right_odysseus.png')
+		self.hitbox_offset = 5
+		self.rect = pygame.Rect(self.x+self.hitbox_offset, self.y, self.width-3*self.hitbox_offset, self.height-self.hitbox_offset)
 		gameDisplay.blit(self.image, [self.x, self.y, self.width, self.height])
 
 	def update_image(self,lead_y, direction):
-		file_name = direction + '_odysseus.gif'
+		file_name = direction + '_odysseus.png'
 		self.image = pygame.image.load(file_name)
-		self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+		self.rect = pygame.Rect(self.x+self.hitbox_offset, self.y, self.width-3*self.hitbox_offset, self.height-self.hitbox_offset)
 		#pygame.draw.rect(gameDisplay, black, self.rect)
 		#if self.attack_state:
 			#sword_hitbox(self)
