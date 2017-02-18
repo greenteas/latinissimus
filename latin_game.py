@@ -49,27 +49,21 @@ class Odysseus(pygame.sprite.Sprite):
 	
 
 class Cyclop(pygame.sprite.Sprite):
+
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		#self.word = word
-		#self.x = random.randrange(display_width*.6, display_width*.95)
-		#self.y = display_height*.8
 		self.block_size = 50
 		self.travel = random.randrange(6)
 		self.image = pygame.image.load('monster.png')
-		
 		self.rect = self.image.get_rect()
-		self.rect.x = random.randrange(display_width*.6, display_width*.95) #display_width*.4
+		self.rect.x = display_width*1.05 #display_width*.4
 		self.rect.y = display_height*.8 #display_height*.4
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
-		self.speedx = - random.randrange(2,4)
+		self.speedx = - random.randrange(2,4)	
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
-		#print(self.travel)
-		#self.x = self.x - self.travel
-		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
-		#gameDisplay.blit(self.image, [self.x, self.y, self.block_size, self.block_size])
+		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
 		
 
 def text_objects(text,color):
@@ -97,10 +91,8 @@ def gameloop():
 	all_sprites = pygame.sprite.Group()
 	cyclops = pygame.sprite.Group()
 		
-	for i in range(5):
-		c = Cyclop()
-		all_sprites.add(c)
-		cyclops.add(c)
+	create_Cyclopes = pygame.USEREVENT+1
+	pygame.time.set_timer(create_Cyclopes,3000)
 
 	while not gameExit:
 		while gameOver == True:
@@ -123,6 +115,11 @@ def gameloop():
 						gameloop() 
 
 		for event in pygame.event.get():
+			if event.type == create_Cyclopes:
+				c = Cyclop()
+				all_sprites.add(c)
+				cyclops.add(c)
+
 			if event.type == pygame.QUIT:
 				gameExit = True
 				gameOver = False
