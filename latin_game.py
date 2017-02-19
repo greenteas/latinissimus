@@ -1,7 +1,10 @@
 import pygame
+import numpy as np
 import random
 import vocabList as vocab
 import time
+import sys
+
 
 pygame.init()
 
@@ -22,7 +25,7 @@ random.seed(int(time.time()))
 def generateRandomList(latin_list):
 	arr = latin_list
 	random.shuffle(arr)
-	vocabulary = arr[:10]
+	vocabulary = arr[:8]
 	return vocabulary
 
 class Odysseus(pygame.sprite.Sprite):
@@ -110,6 +113,7 @@ class Cyclop(pygame.sprite.Sprite):
 	
 
 def update_word():
+	random.seed(int(time.time()))
 	return random.choice(generateRandomList(vocab.latin))	
 
 def text_objects(text,color):
@@ -151,6 +155,36 @@ def main_menu():
 
 		pygame.display.update()
 
+def learningLoop():
+	#vocabulary = generateRandomList(vocab.latin)
+	learn_loop = True
+
+	
+
+	while learn_loop:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				gameExit = True
+				gameOver = False
+			#if event.type == pygame.KEYDOWN:
+				#learn_loop = False
+				#gameloop()
+		
+		
+		#vocab0 = vocabulary[:4]
+		#vocab1 = vocabulary[4:]
+
+		gameDisplay.fill((200,230,230))
+		#pygame.draw.rect(gameDisplay, (0,0,0), [100, 100, 50, 50])
+		font.set_bold(False)
+		text = font.render("Learn the Vocabulary", True, (220,220,220))
+
+		for x in range(30,display_width-30,190):
+			pygame.draw.rect(gameDisplay, white, [x,120, 170, 170])
+			pygame.draw.rect(gameDisplay, white, [x,320, 170, 170])
+
+		pygame.display.update()
+
 def gameloop():
 	#Game Stuff
 	
@@ -170,7 +204,7 @@ def gameloop():
 	cyclops = pygame.sprite.Group()
 		
 	create_Cyclopes = pygame.USEREVENT+1
-	pygame.time.set_timer(create_Cyclopes,3000)
+	pygame.time.set_timer(create_Cyclopes,2000)
 
 	sword = sword_hitbox()
 	count = 0
@@ -255,10 +289,10 @@ def gameloop():
 		if len(collided_list2) != 0:
 			lives = lives - 1
 		for collision in collided_list:
-			print(collision.word)
 			if (vocab.dict[collision.word] == eng_translation):
 				score = score + 1
-				update_word()
+				latin_word_to_guess = update_word()
+				eng_translation = vocab.dict[latin_word_to_guess]
 			else:
 				lives = lives - 1
 
@@ -293,5 +327,5 @@ def gameloop():
 
 
 
-
+#learningLoop()
 main_menu()
