@@ -18,6 +18,8 @@ display_height = 600
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
+icon = pygame.image.load("monster.png")
+pygame.display.set_icon(icon)
 sm_font = pygame.font.Font('Roboto-Light.ttf', 16, bold = False) 
 sm_b_font = pygame.font.Font('Roboto-Medium.ttf', 16, bold = False)
 font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) 
@@ -100,7 +102,7 @@ class Cyclop(pygame.sprite.Sprite):
 
 		print(self.word)
 		self.count = 0
-		self.block_size = 40
+		self.block_size = 50
 		self.image = pygame.image.load('monster.png')
 		# self.rect = self.image.get_rect()
 		# self.rect.x = display_width*1.05
