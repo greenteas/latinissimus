@@ -1,6 +1,7 @@
 import pygame
 import random
 import vocabList as vocab
+import time
 
 pygame.init()
 
@@ -17,10 +18,12 @@ font = pygame.font.SysFont(None,25) #size25
 
 locations = [(display_height*.8)]
 
+random.seed(int(time.time()))
+
 def generateRandomList(latin_list):
 	arr = latin_list
 	random.shuffle(arr)
-	vocabulary = arr[:6]
+	vocabulary = arr[:10]
 	return vocabulary
 
 class Odysseus(pygame.sprite.Sprite):
@@ -239,6 +242,7 @@ def gameloop():
 			print(collision.word)
 			if (vocab.dict[collision.word] == eng_translation):
 				score = score + 1
+				update_word()
 			else:
 				lives = lives - 1
 
@@ -255,12 +259,15 @@ def gameloop():
 		updateHearts(lives)
 
 		# Display the word to guess
-		text1 = font.render("word to guess: ", True, (32,32,32))
-		text2 = font.render(eng_translation, True, (102, 178, 255))
+		text1 = font.render("word to guess: ", True, (0,0,0))
+		text2 = font.render(eng_translation, True, (32,32,32))
+		text3 = font.render("Score:" + str(score), True, (0, 0, 0))
 		text_rect1 = text1.get_rect(left = 30, top = 30)
 		text_rect2 = text2.get_rect(left = 30, top = 50)
+		text_rect3 = text3.get_rect(left = display_width-110, top = 60) 
 		gameDisplay.blit(text1, text_rect1)
 		gameDisplay.blit(text2, text_rect2)
+		gameDisplay.blit(text3, text_rect3)
 		# Display the lives
 		cyclops.update()
 		all_sprites.update()
