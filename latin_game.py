@@ -20,7 +20,7 @@ locations = [(display_height*.8)]
 def generateRandomList(latin_list):
 	arr = latin_list
 	random.shuffle(arr)
-	vocabulary = arr[:10]
+	vocabulary = arr[:6]
 	return vocabulary
 
 class Odysseus(pygame.sprite.Sprite):
@@ -29,7 +29,6 @@ class Odysseus(pygame.sprite.Sprite):
 		self.x = display_width*.2
 		self.y = display_height*.8
 		self.direction = "right"
-		self.lives = 3
 		self.height = 50
 		self.width = 50
 		#Jump Variables
@@ -54,7 +53,8 @@ class Odysseus(pygame.sprite.Sprite):
 		#if self.attack_state:
 			#sword_hitbox(self)
 		gameDisplay.blit(self.image, [self.x, lead_y, self.width, self.height])
-	
+		
+
 class sword_hitbox(pygame.sprite.Sprite):
 	def __init__(self):
 		self.sword_height = 0
@@ -84,18 +84,18 @@ class Cyclop(pygame.sprite.Sprite):
 		self.word = random.choice(generateRandomList(vocab.latin))
 
 		print(self.word)
-
-		self.block_size = 50
-		self.travel = random.randrange(6)
+		self.count = 0
+		self.block_size = 40
 		self.image = pygame.image.load('monster.png')
-		self.rect = self.image.get_rect()
-		self.rect.x = display_width*0.9
-		self.rect.y = display_height*.8
+		# self.rect = self.image.get_rect()
+		# self.rect.x = display_width*1.05
+		# self.rect.y = display_height*.8
+		self.rect = pygame.Rect(display_width*1.5, display_height*.8, 10, 40)
 		text = font.render(self.word, True, black)
 		text_rect = text.get_rect(left=self.rect.x, top= self.rect.y + self.block_size)
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
-		self.speedx = - random.randrange(2,4)	
+		self.speedx = - 3	
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
@@ -104,6 +104,15 @@ class Cyclop(pygame.sprite.Sprite):
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
 		
+	'''
+	def check_collisions(self):
+	    if pygame.sprite.spritecollideany(self,Odysseus) and self.word != update_word():
+	    	print("hi")
+	    	gameOver = True
+	'''
+
+def update_word():
+	return random.choice(generateRandomList(vocab.latin))	
 
 def text_objects(text,color):
 	textSurface = font.render(text, True, color) # render text
@@ -114,14 +123,23 @@ def message_to_screen(msg, color):
 	textRect.center = (display_width/2), (display_height/2)
 	gameDisplay.blit(textSurf,textRect)
 
-def update_word():
-	print(random.choice(generateRandomList(vocab.latin)))
+def updateHearts(lives): 
+	filename = str(lives) + "-Hearts.gif"
+	heartsImage = pygame.image.load(filename)
+	if lives == 1:
+		block_width = 70 
+	elif lives == 2:
+		block_width = 138
+	else:
+		block_width = 200
+	gameDisplay.blit(heartsImage,[display_width-120, 30, 25, 25])
 
 def gameloop():
 	#Game Stuff
 	gameExit = False
 	gameOver = False
-	update_word()
+	latin_word_to_guess = update_word()
+	eng_translation = vocab.dict[latin_word_to_guess]
 	player = Odysseus()
 
 	clock = pygame.time.Clock()
@@ -137,7 +155,9 @@ def gameloop():
 
 	sword = sword_hitbox()
 	count = 0
-
+	lives = 3
+	score = 0
+	
 	while not gameExit:
 		while gameOver == True:
 			gameDisplay.fill(black)
@@ -157,6 +177,7 @@ def gameloop():
 
 					if event.key == pygame.K_c: # if the player continues game
 						gameloop() 
+
 
 		for event in pygame.event.get():
 			if event.type == create_Cyclopes:
@@ -207,15 +228,47 @@ def gameloop():
 			player.middle_of_jump = False
 			player.at_max_height = False
 			player.y += player.change_y
-	
-		if pygame.sprite.spritecollideany(player, cyclops):
-			gameOver = True
+		#x = pygame.sprite.groupcollide()
+		
+		'''
+		if pygame.sprite.spritecollideany(player, cyclops) :
+			lives = True
 		if pygame.sprite.spritecollideany(sword, cyclops):
 			count +=1
 			#print(count)
+		'''
+		collided_list = pygame.sprite.spritecollide(sword, cyclops, True)
+		collided_list2 = pygame.sprite.spritecollide(player, cyclops, True)
+
+		if len(collided_list2) != 0:
+			print("XXXX")
+			lives = lives - 1
+		for collision in collided_list:
+			print(collision.word)
+			if (vocab.dict[collision.word] == eng_translation):
+				score = score + 1
+			else:
+				print("XXXX")
+				lives = lives - 1
+
+		if (lives == 0):
+			gameOver = True
+		
+		
 
 		gameDisplay.fill(white)
 		player.update_image(player.y, player.direction)
+
+		updateHearts(lives)
+
+		# Display the word to guess
+		text1 = font.render("word to guess: ", True, (32,32,32))
+		text2 = font.render(eng_translation, True, (102, 178, 255))
+		text_rect1 = text1.get_rect(left = 30, top = 30)
+		text_rect2 = text2.get_rect(left = 30, top = 50)
+		gameDisplay.blit(text1, text_rect1)
+		gameDisplay.blit(text2, text_rect2)
+		# Display the lives
 		cyclops.update()
 		all_sprites.update()
 		pygame.display.update()
