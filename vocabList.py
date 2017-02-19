@@ -13,3 +13,4 @@ for i in rows[:21]:
 	latin.append(latin_word)
 	english.append(english_word)
 	dict[latin_word] = english_word
+infile.close()
