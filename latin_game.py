@@ -4,7 +4,7 @@ import random
 import vocabList as vocab
 import time
 import sys
-
+from os import path
 
 pygame.init()
 
@@ -18,10 +18,15 @@ display_height = 600
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
-font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) #size25
+sm_font = pygame.font.Font('Roboto-Light.ttf', 16, bold = False) 
+sm_b_font = pygame.font.Font('Roboto-Medium.ttf', 16, bold = False)
+font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) 
+large_font = pygame.font.Font('Roboto-Medium.ttf', 48, bold = False)
 headerfont = pygame.font.Font('Roboto-Light.ttf', 36)
 insfont = pygame.font.Font('Roboto-Light.ttf', 16)
 
+global current_vocab_list 
+current_vocab_list = []
 locations = [(display_height*.8)]
 
 random.seed(int(time.time()))
@@ -29,8 +34,9 @@ random.seed(int(time.time()))
 def generateRandomList(latin_list):
 	arr = latin_list
 	random.shuffle(arr)
-	vocabulary = arr[:8]
-	return vocabulary
+	global current_vocab_list 
+	current_vocab_list = arr[:8]
+	return current_vocab_list
 
 class Odysseus(pygame.sprite.Sprite):
 	def __init__(self):
@@ -90,7 +96,7 @@ class Cyclop(pygame.sprite.Sprite):
 
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		self.word = random.choice(generateRandomList(vocab.latin))
+		self.word = random.choice(current_vocab_list)
 
 		print(self.word)
 		self.count = 0
@@ -116,9 +122,14 @@ class Cyclop(pygame.sprite.Sprite):
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
 	
 
-def update_word():
-	random.seed(int(time.time()))
-	return random.choice(generateRandomList(vocab.latin))	
+def update_word(i):
+	global current_vocab_list
+
+	if (i == 0):
+		current_vocab_list = generateRandomList
+
+	x = current_vocab_list[i]
+	return x
 
 def text_objects(text,color):
 	textSurface = font.render(text, True, color) # render text
@@ -177,13 +188,13 @@ def story():
 
 	while storyloop:
 		for event in pygame.event.get():
-				# if player quits game, exit out of two while loops
-				if event.type == pygame.QUIT:
-					storyloop = False
-					pygame.quit()
-				if event.type == pygame.KEYDOWN:
-					main_menuloop = False
-					learningLoop()
+			# if player quits game, exit out of two while loops
+			if event.type == pygame.QUIT:
+				storyloop = False
+				pygame.quit()
+			if event.type == pygame.KEYDOWN:
+				main_menuloop = False
+				learningLoop()
 
 		gameDisplay.fill(brown)
 		polyph = pygame.image.load("polyph.png")
@@ -207,35 +218,84 @@ def story():
 
 
 def learningLoop():
-	#vocabulary = generateRandomList(vocab.latin)
+	global current_vocab_list 
+	current_vocab_list = generateRandomList(vocab.latin)
+	print(current_vocab_list)
 	learn_loop = True
 
-	
-
 	while learn_loop:
+		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				learn_loop = False
 				pygame.quit()
-			if event.type == pygame.KEYDOWN:
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 				learn_loop = False
 				gameloop()
 		
 		
-		#vocab0 = vocabulary[:4]
-		#vocab1 = vocabulary[4:]
+		vocab0 = current_vocab_list[:4]
+		vocab1 = current_vocab_list[4:]
 
-		gameDisplay.fill((200,230,230))
-		#pygame.draw.rect(gameDisplay, (0,0,0), [100, 100, 50, 50])
-		#font.set_bold(False)
-		text = headerfont.render("Learn the Vocabulary", True, brown)
-		gameDisplay.blit(text, [display_width*.2,display_height*.1,display_width, display_height])
+		gameDisplay.fill((174,207,198))
+		
+		
 
-		for x in range(30,display_width-30,190):
-			pygame.draw.rect(gameDisplay, white, [x,120, 170, 170])
-			pygame.draw.rect(gameDisplay, white, [x,320, 170, 170])
-
+		x = 40
+		
+		for i in range(4):
+			filename0 = vocab.dict[vocab0[i]]+'.png'
+			filename1 = vocab.dict[vocab1[i]]+'.png'
+			image1 = pygame.image.load(path.join('pictures/',filename0))
+			image2 = pygame.image.load(path.join('pictures/',filename1))
+			gameDisplay.blit(image1, [x, 110, 170, 170])
+			gameDisplay.blit(image2, [x, 350, 170, 170])
+			text1 = sm_b_font.render(vocab0[i]+':', True, (10,10,10))
+			text2 = sm_font.render(vocab.dict[vocab0[i]], True, (32,32,32)) 
+			text3 = sm_b_font.render(vocab1[i]+':', True, (10,10,10))
+			text4 = sm_font.render(vocab.dict[vocab1[i]], True, (32,32,32)) 
+			text_rect1 = text1.get_rect(left = x, top = 285)
+			text_rect2 = text2.get_rect(left = x, top = 305)
+			text_rect3 = text2.get_rect(left = x, top = 525)
+			text_rect4 = text2.get_rect(left = x, top = 545)
+			gameDisplay.blit(text1, text_rect1)
+			gameDisplay.blit(text2, text_rect2)
+			gameDisplay.blit(text3, text_rect3)
+			gameDisplay.blit(text4, text_rect4)
+			x = x + 190
+		text = large_font.render("LEARN THE VOCABULARY", True, (0,0,0))
+		text_rect = text.get_rect(left = 120, top = 20)
+		instruction = font.render("Press spacebar to play", True, (25,25,25))
+		instruction_rect = instruction.get_rect(left = display_width/2 -125, top = 70)
+		gameDisplay.blit(text, text_rect)
+		gameDisplay.blit(instruction, instruction_rect)
 		pygame.display.update()
+def youWin():
+	you_Win = True
+	while you_Win:
+
+		gameDisplay.fill((178,158,181))
+		message_to_screen("You win! Press C to play again, press Q to quit.", white)
+		pygame.display.update()
+		global current_vocab_list  
+		current_vocab_list = []
+		for event in pygame.event.get():
+			# if player quits game, exit out of two while loops
+			if event.type == pygame.QUIT:
+				gameExit = True
+				gameOver = False
+				you_Win = False
+				pygame.quit()
+			if event.type == pygame.KEYDOWN:
+
+				if event.key == pygame.K_q: # if the player quits
+					gameExit = True
+					gameOver = False 
+					you_Win = False
+					main_menu()
+				if event.key == pygame.K_c: # if the player continues game
+					you_Win = False
+					learningLoop() 
 
 def gameloop():
 	#Game Stuff
@@ -243,10 +303,11 @@ def gameloop():
 
 	gameExit = False
 	gameOver = False
-	latin_word_to_guess = update_word()
+	you_Win = False
+	global current_vocab_list 
+	latin_word_to_guess = current_vocab_list[0]
 	eng_translation = vocab.dict[latin_word_to_guess]
 	player = Odysseus()
-
 	clock = pygame.time.Clock()
 	FSP = 35
 	y_start_pos = display_height*.8
@@ -271,7 +332,7 @@ def gameloop():
 			gameDisplay.fill(black)
 			message_to_screen("game over, press C to play again or Q to quit", white)
 			pygame.display.update()
-
+			current_vocab_list = []
 			for event in pygame.event.get():
 				# if player quits game, exit out of two while loops
 				if event.type == pygame.QUIT:
@@ -285,7 +346,7 @@ def gameloop():
 						gameOver = False 
 						main_menu()
 					if event.key == pygame.K_c: # if the player continues game
-						gameloop() 
+						learningLoop() 
 
 		### ---- GAME SCREEN ---- ####
 		for event in pygame.event.get():
@@ -303,9 +364,7 @@ def gameloop():
 					player.change_y= -player.travel_step
 					player.middle_of_jump = True
 				# NOTE: REMOVE BOTTOM TWO LINES ONCE WE HAVE CYCLOPS 
-				elif event.key == pygame.K_x:	
-					gameOver = True
-				elif event.key == pygame.K_z:
+				if event.key == pygame.K_z:
 					player.direction = "attack"
 					player.attack_state = True
 
@@ -347,7 +406,8 @@ def gameloop():
 		for collision in collided_list:
 			if (vocab.dict[collision.word] == eng_translation):
 				score = score + 1
-				latin_word_to_guess = update_word()
+				count = count + 1
+				latin_word_to_guess = current_vocab_list[count]
 				eng_translation = vocab.dict[latin_word_to_guess]
 			else:
 				lives = lives - 1
@@ -355,7 +415,9 @@ def gameloop():
 		if (lives == 0):
 			gameOver = True
 		
-		
+		if (count == 8):
+			you_Win = True
+			youWin()
 
 		#gameDisplay.fill(white)
 		bg = pygame.image.load('bg.png')
@@ -383,6 +445,6 @@ def gameloop():
 
 
 
-#learningLoop()
 main_menu()
-#story()
+story()
+learningLoop()
