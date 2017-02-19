@@ -14,8 +14,7 @@ display_height = 600
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
-font = pygame.font.SysFont(None,25) #size25
-cyclop_font = pygame.font.SysFont("Comic Sans MS", 50)
+font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) #size25
 locations = [(display_height*.8)]
 
 random.seed(int(time.time()))
@@ -94,7 +93,8 @@ class Cyclop(pygame.sprite.Sprite):
 		# self.rect.x = display_width*1.05
 		# self.rect.y = display_height*.8
 		self.rect = pygame.Rect(display_width*1.5, display_height*.8, 10, 40)
-		text = cyclop_font.render(self.word, True, black)
+		font.set_bold(False)
+		text = font.render(self.word, True, (220,220,220))
 		text_rect = text.get_rect(left=self.rect.x, top= self.rect.y + self.block_size)
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
@@ -102,17 +102,12 @@ class Cyclop(pygame.sprite.Sprite):
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
-		text = cyclop_font.render(self.word, True, black)
+		font.set_bold(False)
+		text = font.render(self.word, True, (220,220,220))
 		text_rect = text.get_rect(left=self.rect.x - self.speedx, top= self.rect.y - self.block_size)
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
-		
-	'''
-	def check_collisions(self):
-	    if pygame.sprite.spritecollideany(self,Odysseus) and self.word != update_word():
-	    	print("hi")
-	    	gameOver = True
-	'''
+	
 
 def update_word():
 	return random.choice(generateRandomList(vocab.latin))	
@@ -140,6 +135,8 @@ def updateHearts(lives):
 
 def gameloop():
 	#Game Stuff
+	
+
 	gameExit = False
 	gameOver = False
 	latin_word_to_guess = update_word()
@@ -164,6 +161,7 @@ def gameloop():
 
 	while not gameExit:
 		while gameOver == True:
+
 			gameDisplay.fill(black)
 			message_to_screen("game over, press C to play again or Q to quit", white)
 			pygame.display.update()
@@ -259,12 +257,13 @@ def gameloop():
 		updateHearts(lives)
 
 		# Display the word to guess
-		text1 = font.render("word to guess: ", True, (0,0,0))
-		text2 = font.render(eng_translation, True, (32,32,32))
-		text3 = font.render("Score:" + str(score), True, (0, 0, 0))
-		text_rect1 = text1.get_rect(left = 30, top = 30)
-		text_rect2 = text2.get_rect(left = 30, top = 50)
-		text_rect3 = text3.get_rect(left = display_width-110, top = 80) 
+		font.set_bold(True)
+		text1 = font.render("word to guess: ", True, (32,32,32))
+		text2 = font.render(eng_translation, True, (190,190,190))
+		text3 = font.render("Score:" + str(score), True, (32,32,32))
+		text_rect1 = text1.get_rect(left = 30, top = 35)
+		text_rect2 = text2.get_rect(left = 30, top = 65)
+		text_rect3 = text3.get_rect(left = display_width-180, top = 80) 
 		gameDisplay.blit(text1, text_rect1)
 		gameDisplay.blit(text2, text_rect2)
 		gameDisplay.blit(text3, text_rect3)
