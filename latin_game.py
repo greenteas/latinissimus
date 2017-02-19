@@ -10,6 +10,7 @@ pygame.init()
 
 black = (0,0,0)
 white = (255,255,255)
+brown = (176, 154, 141)
 
 #Window Sizes
 display_width = 800
@@ -148,12 +149,50 @@ def main_menu():
 					gameOver = False
 				if event.type == pygame.KEYDOWN:
 					main_menuloop = False
-					gameloop()
+					story()
 
-		bg = pygame.image.load('bg.png')
+		bg = pygame.image.load('title.png')
 		gameDisplay.blit(bg, bg.get_rect())
 
 		pygame.display.update()
+
+def story():
+	storyloop = True
+	poly_pos_x = display_width
+	poly_intro_x = -display_width
+	poly_intro2_y = display_height
+	move_poly = 20
+
+	while storyloop:
+		for event in pygame.event.get():
+				# if player quits game, exit out of two while loops
+				if event.type == pygame.QUIT:
+					gameExit = True
+					gameOver = False
+				if event.type == pygame.KEYDOWN:
+					main_menuloop = False
+					learningLoop()
+
+		gameDisplay.fill(brown)
+		polyph = pygame.image.load("polyph.png")
+		poly_intro = pygame.image.load("polyintro.png")
+		poly_intro2 = pygame.image.load("polyintro2.png")
+		gameDisplay.blit(polyph, [poly_pos_x, 0, display_width, display_height])
+		gameDisplay.blit(poly_intro, [poly_intro_x, 0, display_width, display_height])
+		gameDisplay.blit(poly_intro2, [0, poly_intro2_y, display_width, display_height])
+
+
+		if poly_pos_x > 0:
+			poly_pos_x -= move_poly
+
+		if poly_pos_x <= 0 and poly_intro_x < 0:
+			poly_intro_x += move_poly
+
+		if poly_pos_x <= 0 and poly_intro_x >=0 and poly_intro2_y > 0:
+			poly_intro2_y -= move_poly
+
+		pygame.display.update()
+
 
 def learningLoop():
 	#vocabulary = generateRandomList(vocab.latin)
@@ -329,3 +368,4 @@ def gameloop():
 
 #learningLoop()
 main_menu()
+#story()
