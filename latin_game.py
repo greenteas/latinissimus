@@ -133,6 +133,24 @@ def updateHearts(lives):
 			block_width = 200
 		gameDisplay.blit(heartsImage,[display_width-200, 30, 25, 25])
 
+def main_menu():
+	main_menuloop = True
+
+	while main_menuloop:
+		for event in pygame.event.get():
+				# if player quits game, exit out of two while loops
+				if event.type == pygame.QUIT:
+					gameExit = True
+					gameOver = False
+				if event.type == pygame.KEYDOWN:
+					main_menuloop = False
+					gameloop()
+
+		bg = pygame.image.load('bg.png')
+		gameDisplay.blit(bg, bg.get_rect())
+
+		pygame.display.update()
+
 def gameloop():
 	#Game Stuff
 	
@@ -276,4 +294,4 @@ def gameloop():
 
 
 
-gameloop()
+main_menu()
