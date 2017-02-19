@@ -247,7 +247,9 @@ def gameloop():
 		
 		
 
-		gameDisplay.fill(white)
+		#gameDisplay.fill(white)
+		bg = pygame.image.load('bg.png')
+		gameDisplay.blit(bg, bg.get_rect())
 		player.update_image(player.y, player.direction)
 
 		updateHearts(lives)
