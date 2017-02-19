@@ -15,7 +15,7 @@ display_height = 600
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
 font = pygame.font.SysFont(None,25) #size25
-
+cyclop_font = pygame.font.SysFont("Comic Sans MS", 50)
 locations = [(display_height*.8)]
 
 random.seed(int(time.time()))
@@ -94,7 +94,7 @@ class Cyclop(pygame.sprite.Sprite):
 		# self.rect.x = display_width*1.05
 		# self.rect.y = display_height*.8
 		self.rect = pygame.Rect(display_width*1.5, display_height*.8, 10, 40)
-		text = font.render(self.word, True, black)
+		text = cyclop_font.render(self.word, True, black)
 		text_rect = text.get_rect(left=self.rect.x, top= self.rect.y + self.block_size)
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
@@ -102,7 +102,7 @@ class Cyclop(pygame.sprite.Sprite):
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
-		text = font.render(self.word, True, black)
+		text = cyclop_font.render(self.word, True, black)
 		text_rect = text.get_rect(left=self.rect.x - self.speedx, top= self.rect.y - self.block_size)
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
@@ -128,7 +128,7 @@ def message_to_screen(msg, color):
 
 def updateHearts(lives): 
 	if (lives!=0):
-		filename = str(lives) + "-Hearts.gif"
+		filename = str(lives) + "-Hearts.png"
 		heartsImage = pygame.image.load(filename)
 		if lives == 1:
 			block_width = 70 
@@ -136,7 +136,7 @@ def updateHearts(lives):
 			block_width = 138
 		else:
 			block_width = 200
-		gameDisplay.blit(heartsImage,[display_width-120, 30, 25, 25])
+		gameDisplay.blit(heartsImage,[display_width-200, 30, 25, 25])
 
 def gameloop():
 	#Game Stuff
@@ -264,7 +264,7 @@ def gameloop():
 		text3 = font.render("Score:" + str(score), True, (0, 0, 0))
 		text_rect1 = text1.get_rect(left = 30, top = 30)
 		text_rect2 = text2.get_rect(left = 30, top = 50)
-		text_rect3 = text3.get_rect(left = display_width-110, top = 60) 
+		text_rect3 = text3.get_rect(left = display_width-110, top = 80) 
 		gameDisplay.blit(text1, text_rect1)
 		gameDisplay.blit(text2, text_rect2)
 		gameDisplay.blit(text3, text_rect3)
