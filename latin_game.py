@@ -8,11 +8,12 @@ from os import path
 
 pygame.init()
 
+# set default colors
 black = (0,0,0)
 white = (255,255,255)
 brown = (176, 154, 141)
 
-#Window Sizes
+# window Sizes
 display_width = 800
 display_height = 600
 
@@ -20,6 +21,8 @@ gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
 icon = pygame.image.load("monster.png")
 pygame.display.set_icon(icon)
+
+# set fonts
 sm_font = pygame.font.Font('Roboto-Light.ttf', 16, bold = False) 
 sm_b_font = pygame.font.Font('Roboto-Medium.ttf', 16, bold = False)
 font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) 
@@ -27,12 +30,14 @@ large_font = pygame.font.Font('Roboto-Medium.ttf', 48, bold = False)
 headerfont = pygame.font.Font('Roboto-Light.ttf', 36)
 insfont = pygame.font.Font('Roboto-Light.ttf', 16)
 
+# current_vocab_list - stores the vocabulary words currently being tested
 global current_vocab_list 
 current_vocab_list = []
 locations = [(display_height*.8)]
 
 random.seed(int(time.time()))
 
+# generateRandomList -  returns a randomly generated list of Latin words
 def generateRandomList(latin_list):
 	arr = latin_list
 	random.shuffle(arr)
@@ -40,7 +45,10 @@ def generateRandomList(latin_list):
 	current_vocab_list = arr[:8]
 	return current_vocab_list
 
+# the Odysseus class is used to create Odysseus, the main character
 class Odysseus(pygame.sprite.Sprite):
+
+	# initialize Odysseus sprite
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 		self.x = display_width*.2
@@ -48,7 +56,8 @@ class Odysseus(pygame.sprite.Sprite):
 		self.direction = "right"
 		self.height = 50
 		self.width = 50
-		#Jump Variables
+
+		# variables that will allow the sprite to smoothly jump
 		self.jump_max_height = self.y-self.height*2
 		self.change_y = 0
 		self.middle_of_jump = False
@@ -62,51 +71,55 @@ class Odysseus(pygame.sprite.Sprite):
 		self.rect = pygame.Rect(self.x+self.hitbox_offset, self.y, self.width-3*self.hitbox_offset, self.height-self.hitbox_offset)
 		gameDisplay.blit(self.image, [self.x, self.y, self.width, self.height])
 
+	# update_image - updates the image of the sprite based on the direction it is facing
 	def update_image(self,lead_y, direction):
 		file_name = direction + '_odysseus.png'
 		self.image = pygame.image.load(file_name)
 		self.rect = pygame.Rect(self.x+self.hitbox_offset, self.y, self.width-3*self.hitbox_offset, self.height-self.hitbox_offset)
-		#pygame.draw.rect(gameDisplay, black, self.rect)
-		#if self.attack_state:
-			#sword_hitbox(self)
 		gameDisplay.blit(self.image, [self.x, lead_y, self.width, self.height])
 		
-
+# the sword hit_box class will create the hit box region for the sword
+# the hit box will detect collisions with the Cyclops
 class sword_hitbox(pygame.sprite.Sprite):
+
+	# initialize the sword of Odysseus
 	def __init__(self):
 		self.sword_height = 0
 		self.sword_length = 0
 		self.rect = pygame.Rect(0,0,1,1)
 
+	# set - sets the hit box on the sword
 	def set(self, player):
 		self.sword_height= player.height
 		self.sword_length= 40
 		self.rect = pygame.Rect(player.x+player.width,player.y, self.sword_length, self.sword_height)
 		#self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.rect)
 	
+	# reset - resets the hit box away from the sword
 	def reset(self):
 		self.sword_height = 0
 		self.sword_length = 0
 		self.rect = pygame.Rect(0,0,1,1)
 
+	# update_hitbox - update the position of the hit box based on movement of Odysseus
 	def update_hitbox(self, player):
 		self.sword_height: player.height
 		self.rect = pygame.Rect(player.x+player.width,player.y, self.sword_length, self.sword_height)
 		#self.sword_hitbox = pygame.draw.rect(gameDisplay, black, self.rect)
 
+# Cyclop class creates a Cyclopes sprite for the enemy characters in the game
 class Cyclop(pygame.sprite.Sprite):
 
+	# initialize the Cyclop sprite
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
+
+		# word will be the word assigned to each Cyclops
 		self.word = random.choice(current_vocab_list)
 
-		print(self.word)
-		self.count = 0
+		# variables that will allow us to control image and movement of the Cyclops
 		self.block_size = 50
 		self.image = pygame.image.load('monster.png')
-		# self.rect = self.image.get_rect()
-		# self.rect.x = display_width*1.05
-		# self.rect.y = display_height*.8
 		self.rect = pygame.Rect(display_width*1.5, display_height*.8, 10, 40)
 		font.set_bold(False)
 		text = font.render(self.word, True, (220,220,220))
@@ -115,6 +128,7 @@ class Cyclop(pygame.sprite.Sprite):
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
 		self.speedx = - 3	
 
+	# update - group function that will update the movements and positions of each sprite from the group
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
 		font.set_bold(False)
@@ -123,25 +137,18 @@ class Cyclop(pygame.sprite.Sprite):
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
 	
-
-def update_word(i):
-	global current_vocab_list
-
-	if (i == 0):
-		current_vocab_list = generateRandomList
-
-	x = current_vocab_list[i]
-	return x
-
+# text_objects - renders font
 def text_objects(text,color):
 	textSurface = font.render(text, True, color) # render text
 	return textSurface, textSurface.get_rect()
 
+#  message_to_screen - function that displays message to screen
 def message_to_screen(msg, color):
 	textSurf, textRect = text_objects(msg,color) 
 	textRect.center = (display_width/2), (display_height/2)
 	gameDisplay.blit(textSurf,textRect)
 
+# updateHearts - updates the lives of Odysseus
 def updateHearts(lives): 
 	if (lives!=0):
 		filename = str(lives) + "-Hearts.png"
@@ -154,6 +161,7 @@ def updateHearts(lives):
 			block_width = 200
 		gameDisplay.blit(heartsImage,[display_width-200, 30, 25, 25])
 
+# main_menu - displays the main menu that welcomes the user to play the game
 def main_menu():
 	main_menuloop = True
 
@@ -181,6 +189,7 @@ def main_menu():
 
 		pygame.display.update()
 
+# story - displays the intermediate screen that will show after the main_menu and the vocabulary display
 def story():
 	storyloop = True
 	poly_pos_x = display_width
@@ -218,8 +227,9 @@ def story():
 
 		pygame.display.update()
 
-
+# learningLoop - displays the vocabulary words for the user to learn before playing the game
 def learningLoop():
+	# generate a list of words using the generateRandomList(vocab.latin) function
 	global current_vocab_list 
 	current_vocab_list = generateRandomList(vocab.latin)
 	print(current_vocab_list)
@@ -242,7 +252,7 @@ def learningLoop():
 		gameDisplay.fill((174,207,198))
 		
 		
-
+		# x - the x position for the text that will be displayed
 		x = 40
 		
 		for i in range(4):
@@ -272,6 +282,8 @@ def learningLoop():
 		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(instruction, instruction_rect)
 		pygame.display.update()
+
+# youWin - displays the youWin screen
 def youWin():
 	you_Win = True
 	while you_Win:
@@ -299,6 +311,7 @@ def youWin():
 					you_Win = False
 					learningLoop() 
 
+# gameloop - displays the actual game
 def gameloop():
 	#Game Stuff
 	
