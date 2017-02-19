@@ -1,5 +1,6 @@
 import pygame
 import random
+import vocabList as vocab
 
 pygame.init()
 
@@ -15,6 +16,13 @@ pygame.display.set_caption('Latinissmimus')
 font = pygame.font.SysFont(None,25) #size25
 
 locations = [(display_height*.8)]
+
+def generateRandomList(latin_list):
+	arr = latin_list
+	random.shuffle(arr)
+	vocabulary = arr[:10]
+	return vocabulary
+
 class Odysseus(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -73,17 +81,27 @@ class Cyclop(pygame.sprite.Sprite):
 
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
+		self.word = random.choice(generateRandomList(vocab.latin))
+
+		print(self.word)
+
 		self.block_size = 50
 		self.travel = random.randrange(6)
 		self.image = pygame.image.load('monster.png')
 		self.rect = self.image.get_rect()
-		self.rect.x = display_width*1.05 #display_width*.4
-		self.rect.y = display_height*.8 #display_height*.4
+		self.rect.x = display_width*0.9
+		self.rect.y = display_height*.8
+		text = font.render(self.word, True, black)
+		text_rect = text.get_rect(left=self.rect.x, top= self.rect.y + self.block_size)
+		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image, [self.rect.x, self.rect.y, self.block_size, self.block_size])
 		self.speedx = - random.randrange(2,4)	
 
 	def update(self):
 		self.rect = self.rect.move(self.speedx,0)
+		text = font.render(self.word, True, black)
+		text_rect = text.get_rect(left=self.rect.x - self.speedx, top= self.rect.y - self.block_size)
+		gameDisplay.blit(text, text_rect)
 		gameDisplay.blit(self.image,[self.rect.x, self.rect.y, self.block_size, self.block_size])
 		
 
@@ -96,16 +114,18 @@ def message_to_screen(msg, color):
 	textRect.center = (display_width/2), (display_height/2)
 	gameDisplay.blit(textSurf,textRect)
 
+def update_word():
+	print(random.choice(generateRandomList(vocab.latin)))
 
 def gameloop():
 	#Game Stuff
 	gameExit = False
 	gameOver = False
-
+	update_word()
 	player = Odysseus()
 
 	clock = pygame.time.Clock()
-	FSP = 30
+	FSP = 35
 	y_start_pos = display_height*.8
 	bottom = y_start_pos
 	
@@ -192,7 +212,7 @@ def gameloop():
 			gameOver = True
 		if pygame.sprite.spritecollideany(sword, cyclops):
 			count +=1
-			print(count)
+			#print(count)
 
 		gameDisplay.fill(white)
 		player.update_image(player.y, player.direction)
