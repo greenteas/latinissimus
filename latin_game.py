@@ -124,15 +124,16 @@ def message_to_screen(msg, color):
 	gameDisplay.blit(textSurf,textRect)
 
 def updateHearts(lives): 
-	filename = str(lives) + "-Hearts.gif"
-	heartsImage = pygame.image.load(filename)
-	if lives == 1:
-		block_width = 70 
-	elif lives == 2:
-		block_width = 138
-	else:
-		block_width = 200
-	gameDisplay.blit(heartsImage,[display_width-120, 30, 25, 25])
+	if (lives!=0):
+		filename = str(lives) + "-Hearts.gif"
+		heartsImage = pygame.image.load(filename)
+		if lives == 1:
+			block_width = 70 
+		elif lives == 2:
+			block_width = 138
+		else:
+			block_width = 200
+		gameDisplay.blit(heartsImage,[display_width-120, 30, 25, 25])
 
 def gameloop():
 	#Game Stuff
@@ -157,7 +158,7 @@ def gameloop():
 	count = 0
 	lives = 3
 	score = 0
-	
+
 	while not gameExit:
 		while gameOver == True:
 			gameDisplay.fill(black)
@@ -228,27 +229,17 @@ def gameloop():
 			player.middle_of_jump = False
 			player.at_max_height = False
 			player.y += player.change_y
-		#x = pygame.sprite.groupcollide()
 		
-		'''
-		if pygame.sprite.spritecollideany(player, cyclops) :
-			lives = True
-		if pygame.sprite.spritecollideany(sword, cyclops):
-			count +=1
-			#print(count)
-		'''
 		collided_list = pygame.sprite.spritecollide(sword, cyclops, True)
 		collided_list2 = pygame.sprite.spritecollide(player, cyclops, True)
 
 		if len(collided_list2) != 0:
-			print("XXXX")
 			lives = lives - 1
 		for collision in collided_list:
 			print(collision.word)
 			if (vocab.dict[collision.word] == eng_translation):
 				score = score + 1
 			else:
-				print("XXXX")
 				lives = lives - 1
 
 		if (lives == 0):
