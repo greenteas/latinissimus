@@ -19,6 +19,7 @@ display_height = 600
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
 font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) #size25
+headerfont = pygame.font.Font('Roboto-Light.ttf', 36)
 insfont = pygame.font.Font('Roboto-Light.ttf', 16)
 
 locations = [(display_height*.8)]
@@ -148,6 +149,7 @@ def main_menu():
 				# if player quits game, exit out of two while loops
 				if event.type == pygame.QUIT:
 					main_menuloop = False
+					pygame.quit()
 				if event.type == pygame.KEYDOWN:
 					main_menuloop = False
 					story()
@@ -178,6 +180,7 @@ def story():
 				# if player quits game, exit out of two while loops
 				if event.type == pygame.QUIT:
 					storyloop = False
+					pygame.quit()
 				if event.type == pygame.KEYDOWN:
 					main_menuloop = False
 					learningLoop()
@@ -213,9 +216,10 @@ def learningLoop():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				learn_loop = False
-			#if event.type == pygame.KEYDOWN:
-				#learn_loop = False
-				#gameloop()
+				pygame.quit()
+			if event.type == pygame.KEYDOWN:
+				learn_loop = False
+				gameloop()
 		
 		
 		#vocab0 = vocabulary[:4]
@@ -223,8 +227,9 @@ def learningLoop():
 
 		gameDisplay.fill((200,230,230))
 		#pygame.draw.rect(gameDisplay, (0,0,0), [100, 100, 50, 50])
-		font.set_bold(False)
-		text = font.render("Learn the Vocabulary", True, (220,220,220))
+		#font.set_bold(False)
+		text = headerfont.render("Learn the Vocabulary", True, brown)
+		gameDisplay.blit(text, [display_width*.2,display_height*.1,display_width, display_height])
 
 		for x in range(30,display_width-30,190):
 			pygame.draw.rect(gameDisplay, white, [x,120, 170, 170])
@@ -259,6 +264,8 @@ def gameloop():
 	score = 0
 
 	while not gameExit:
+
+		### ---- GAME OVER SCREEN ---- ###
 		while gameOver == True:
 
 			gameDisplay.fill(black)
@@ -270,16 +277,17 @@ def gameloop():
 				if event.type == pygame.QUIT:
 					gameExit = True
 					gameOver = False
+					pygame.quit()
 				if event.type == pygame.KEYDOWN:
 
 					if event.key == pygame.K_q: # if the player quits
 						gameExit = True
 						gameOver = False 
-
+						main_menu()
 					if event.key == pygame.K_c: # if the player continues game
 						gameloop() 
 
-
+		### ---- GAME SCREEN ---- ####
 		for event in pygame.event.get():
 			if event.type == create_Cyclopes:
 				c = Cyclop()
@@ -289,6 +297,7 @@ def gameloop():
 			if event.type == pygame.QUIT:
 				gameExit = True
 				gameOver = False
+				pygame.quit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_UP and player.middle_of_jump == False:
 					player.change_y= -player.travel_step
