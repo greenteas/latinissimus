@@ -19,6 +19,8 @@ display_height = 600
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Latinissmimus')
 font = pygame.font.Font('Roboto-Light.ttf', 25, bold = True) #size25
+insfont = pygame.font.Font('Roboto-Light.ttf', 16)
+
 locations = [(display_height*.8)]
 
 random.seed(int(time.time()))
@@ -145,14 +147,22 @@ def main_menu():
 		for event in pygame.event.get():
 				# if player quits game, exit out of two while loops
 				if event.type == pygame.QUIT:
-					gameExit = True
-					gameOver = False
+					main_menuloop = False
 				if event.type == pygame.KEYDOWN:
 					main_menuloop = False
 					story()
 
 		bg = pygame.image.load('title.png')
 		gameDisplay.blit(bg, bg.get_rect())
+		instruction1 = insfont.render("Help Ulysseus take on the Cyclopes!", True, (220,220,220))
+		instruction2 = insfont.render("Jump over Cyclopes with incorrect Latin translations of English words with UP ARROW.", True, (220,220,200))
+		instruction3 = insfont.render("Attack the Cyclops with the correct translation with Z.", True,(220,220,200))
+		instruction4 = insfont.render("Touching Cyclopes or hitting the wrong Cyclopes will cost lives, so be careful!",True, (220,220,200))
+			
+		gameDisplay.blit(instruction1, [275, display_height/2, display_width*.8, 200])
+		gameDisplay.blit(instruction2, [100, display_height/2+20, display_width*.8, 200])
+		gameDisplay.blit(instruction3, [175, display_height/2+40, display_width*.8, 200])
+		gameDisplay.blit(instruction4, [125, display_height/2+60, display_width*.8, 200])
 
 		pygame.display.update()
 
@@ -167,8 +177,7 @@ def story():
 		for event in pygame.event.get():
 				# if player quits game, exit out of two while loops
 				if event.type == pygame.QUIT:
-					gameExit = True
-					gameOver = False
+					storyloop = False
 				if event.type == pygame.KEYDOWN:
 					main_menuloop = False
 					learningLoop()
@@ -203,8 +212,7 @@ def learningLoop():
 	while learn_loop:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				gameExit = True
-				gameOver = False
+				learn_loop = False
 			#if event.type == pygame.KEYDOWN:
 				#learn_loop = False
 				#gameloop()
